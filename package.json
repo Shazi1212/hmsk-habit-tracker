@@ -1,0 +1,12 @@
+{
+  "name": "hmsk-habit-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A habit tracker that runs in the browser, plus a yearly habit tracker spreadsheet.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/",
+    "xlsx": "python3 tools/make_xlsx.py",
+    "start": "python3 -m http.server 8080 --directory public"
+  }
+}
