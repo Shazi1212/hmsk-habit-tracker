@@ -32,6 +32,7 @@ kbd { font: 600 11px/1 var(--sans); color: var(--ink-2); border: 1px solid var(-
 .tabs button:hover { color: var(--ink); }
 .tabs button[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--accent); }
 @media (max-width: 419px) { .tabs button { padding: var(--sm) 6px; font-size: 14px; } }
+@media (max-width: 359px) { .tabs { flex-wrap: wrap; overflow-x: visible; } .tabs button { min-height: 40px; } } /* every tab stays visible on the smallest phones */
 @media (min-width: 420px) { .tabs button { padding: var(--sm) 10px; } }
 @media (min-width: 760px) { .tabs { flex: 0 1 auto; margin: 0 0 0 auto; padding: 0; } .top__in { padding-top: 0; } }
 

@@ -19,16 +19,16 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.properties import PageSetupProperties
 
-# hmsk.life tokens (docs/design/DESIGN.md), adapted for a white sheet
-BG = "0B0F0C"
-PRIMARY = "00FF9C"
-SECONDARY = "1E5C40"
-ACCENT = "FFB547"
-MUTED = "8FA898"
-BORDER = "26372D"
-LIGHT = "E4F2E8"
-WEEKEND = "F1F7F3"
-OUTSIDE = "D9DED9"
+# hmsk.life Letterpress A1 "Ink Blue" tokens (public/letterpress.css), adapted for a white sheet.
+# Header text is white on the accent (8.6:1), ticks and today are ink on mark (10:1), small text ink-2 on white (7.7:1).
+INK = "151B24"
+INK_2 = "4A5562"
+ACCENT = "1E4C8A"
+MARK = "A8C8F2"
+TINT = "DCE6F3"
+RULE = "CBD2D9"
+WEEKEND = "EFF1F2"
+OUTSIDE = "E2E6E9"
 
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 N_HABITS = 10
@@ -46,21 +46,21 @@ SETUP_COUNT = "Setup!$C$17"
 L = get_column_letter
 DAY_FIRST, DAY_LAST = L(FIRST_DAY_COL), L(LAST_DAY_COL)
 
-dark = PatternFill("solid", fgColor=BG)
-input_fill = PatternFill("solid", fgColor="FFF4E0")
-thin = Side(style="thin", color="C9D6CE")
+dark = PatternFill("solid", fgColor=ACCENT)
+input_fill = PatternFill("solid", fgColor=TINT)
+thin = Side(style="thin", color=RULE)
 box = Border(left=thin, right=thin, top=thin, bottom=thin)
 center = Alignment(horizontal="center", vertical="center")
-F_TITLE = Font(name="Calibri", size=18, bold=True, color=BG)
-F_HEAD = Font(name="Calibri", size=10, bold=True, color=PRIMARY)
-F_WD = Font(name="Calibri", size=9, color=MUTED)
-F_SMALL = Font(name="Calibri", size=9, color="5B6E62")
+F_TITLE = Font(name="Calibri", size=18, bold=True, color=INK)
+F_HEAD = Font(name="Calibri", size=10, bold=True, color="FFFFFF")
+F_WD = Font(name="Calibri", size=9, color=MARK)  # on the accent header: 5.1:1
+F_SMALL = Font(name="Calibri", size=9, color=INK_2)
 F_BOLD = Font(name="Calibri", size=11, bold=True)
-F_TICK = Font(name="Calibri", size=11, bold=True, color=BG)
+F_TICK = Font(name="Calibri", size=11, bold=True, color=INK)
 
-GREEN_SCALE = dict(start_type="num", start_value=0, start_color="F3F8F5",
-                   mid_type="num", mid_value=0.5, mid_color="8FE9C0",
-                   end_type="num", end_value=1, end_color=PRIMARY)
+BLUE_SCALE = dict(start_type="num", start_value=0, start_color="F8F9FA",
+                  mid_type="num", mid_value=0.5, mid_color=MARK,
+                  end_type="num", end_value=1, end_color="7FA6DC")  # ink text stays ≥ 6.9:1 on every step
 
 
 def page_setup(ws, area):
@@ -78,7 +78,7 @@ def page_setup(ws, area):
 def build_setup(wb, year, examples):
     ws = wb.active
     ws.title = "Setup"
-    ws.sheet_properties.tabColor = ACCENT
+    ws.sheet_properties.tabColor = MARK
     ws["A1"] = "Habit Tracker"
     ws["A1"].font = F_TITLE
     ws["D1"] = "hmsk.life/tools/habit-tracker"
@@ -87,7 +87,7 @@ def build_setup(wb, year, examples):
     ws["A3"].font = F_BOLD
     ws["C3"] = year
     ws["C3"].font = Font(name="Calibri", size=14, bold=True)
-    ws["C3"].fill = PatternFill("solid", fgColor=ACCENT)
+    ws["C3"].fill = PatternFill("solid", fgColor=MARK)
     ws["C3"].alignment = center
     ws["C3"].border = box
     ws["D3"] = "Change the year here, every month sheet follows. / Jahr hier ändern, alle Monate folgen."
@@ -153,7 +153,7 @@ def build_setup(wb, year, examples):
 def build_month(wb, m):
     ws = wb.create_sheet(MONTHS[m - 1])
     prev = MONTHS[m - 2] if m > 1 else None
-    ws.sheet_properties.tabColor = SECONDARY
+    ws.sheet_properties.tabColor = INK_2
 
     ws["A1"] = f"=DATE({SETUP_YEAR},{m},1)"
     ws["A1"].number_format = "mmmm yyyy"
@@ -238,7 +238,7 @@ def build_month(wb, m):
              f'SUMPRODUCT(({letter}${ROW_H1}:{letter}${ROW_HN}<>"")*($A${ROW_H1}:$A${ROW_HN}<>""))/{SETUP_COUNT}))')
         c = ws.cell(ROW_DAYPCT, col, f)
         c.number_format = "0%"
-        c.font = Font(name="Calibri", size=8, color="33473B")
+        c.font = Font(name="Calibri", size=8, color=INK_2)
         c.alignment = center
     month_pct = ws.cell(ROW_DAYPCT, COL_PCT, f'=IFERROR(AVERAGE({L(COL_PCT)}{ROW_H1}:{L(COL_PCT)}{ROW_HN}),"")')
     month_pct.number_format = "0%"
@@ -264,14 +264,14 @@ def build_month(wb, m):
     ws.conditional_formatting.add(grid, FormulaRule(formula=[f'{DAY_FIRST}${ROW_DATE}=""'], stopIfTrue=True,
                                                     fill=PatternFill("solid", fgColor=OUTSIDE, bgColor=OUTSIDE)))
     ws.conditional_formatting.add(ticks, FormulaRule(formula=[f'{DAY_FIRST}{ROW_H1}<>""'], stopIfTrue=True,
-                                                     fill=PatternFill("solid", fgColor=PRIMARY, bgColor=PRIMARY), font=Font(bold=True, color=BG)))
+                                                     fill=PatternFill("solid", fgColor=MARK, bgColor=MARK), font=Font(bold=True, color=INK)))
     ws.conditional_formatting.add(f"{DAY_FIRST}{ROW_DATE}:{DAY_LAST}{ROW_WD}",
                                   FormulaRule(formula=[f"{DAY_FIRST}${ROW_DATE}=TODAY()"], stopIfTrue=True,
-                                              fill=PatternFill("solid", fgColor=ACCENT, bgColor=ACCENT), font=Font(bold=True, color=BG)))
+                                              fill=PatternFill("solid", fgColor=MARK, bgColor=MARK), font=Font(bold=True, color=INK)))
     ws.conditional_formatting.add(ticks, FormulaRule(formula=[f"WEEKDAY({DAY_FIRST}${ROW_DATE},2)>5"],
                                                      fill=PatternFill("solid", fgColor=WEEKEND, bgColor=WEEKEND)))
-    ws.conditional_formatting.add(f"{L(COL_PCT)}{ROW_H1}:{L(COL_PCT)}{ROW_DAYPCT}", ColorScaleRule(**GREEN_SCALE))
-    ws.conditional_formatting.add(f"{DAY_FIRST}{ROW_DAYPCT}:{DAY_LAST}{ROW_DAYPCT}", ColorScaleRule(**GREEN_SCALE))
+    ws.conditional_formatting.add(f"{L(COL_PCT)}{ROW_H1}:{L(COL_PCT)}{ROW_DAYPCT}", ColorScaleRule(**BLUE_SCALE))
+    ws.conditional_formatting.add(f"{DAY_FIRST}{ROW_DAYPCT}:{DAY_LAST}{ROW_DAYPCT}", ColorScaleRule(**BLUE_SCALE))
 
     ws.column_dimensions["A"].width = 26
     for col in range(FIRST_DAY_COL, LAST_DAY_COL + 1):
@@ -286,7 +286,7 @@ def build_month(wb, m):
 
 def build_overview(wb):
     ws = wb.create_sheet("Overview", 1)
-    ws.sheet_properties.tabColor = PRIMARY
+    ws.sheet_properties.tabColor = ACCENT
     ws["A1"] = "Habit Tracker"
     ws["A1"].font = F_TITLE
     ws["C1"] = f"={SETUP_YEAR}"
@@ -340,8 +340,8 @@ def build_overview(wb):
     c.alignment = center
     c.font = F_BOLD
     ws.cell(tr + 2, 1, "% = share of the goal (days per week on Setup). Streak = days in a row, today counts once ticked.").font = F_SMALL
-    ws.conditional_formatting.add(f"B4:M{tr}", ColorScaleRule(**GREEN_SCALE))
-    ws.conditional_formatting.add(f"O4:O{tr}", ColorScaleRule(**GREEN_SCALE))
+    ws.conditional_formatting.add(f"B4:M{tr}", ColorScaleRule(**BLUE_SCALE))
+    ws.conditional_formatting.add(f"O4:O{tr}", ColorScaleRule(**BLUE_SCALE))
     ws.column_dimensions["A"].width = 28
     for col in range(2, 14):
         ws.column_dimensions[L(col)].width = 7

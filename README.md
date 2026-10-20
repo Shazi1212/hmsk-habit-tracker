@@ -43,7 +43,7 @@ python3 tools/make_xlsx.py habit-tracker.xlsx --year 2026
 
 One Setup sheet (the year and up to 10 habits with days per week, typed once), an Overview sheet (% per month, year %,
 current and best streak) and one sheet per month with tick cells (x or ✓), done/goal/% per habit, daily %, a streak that
-carries over between months, green colour scales, frozen headers and A4 landscape print setup. Change the year on
+carries over between months, blue colour scales (hmsk.life Letterpress colours), frozen headers and A4 landscape print setup. Change the year on
 Setup and every month follows. It only uses functions that exist in Excel, LibreOffice and Google Sheets.
 
 The ready file is at https://hmsk.life/assets/downloads/habit-tracker.xlsx.
