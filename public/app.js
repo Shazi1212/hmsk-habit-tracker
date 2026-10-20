@@ -107,7 +107,7 @@
     const used = state.meta.useDays.length >= 7;
     if (DEMO && !force) return '';
     if (!force && (!used || state.meta.emailOfferHidden)) return '';
-    const href = (CFG.site || '') + (lang === 'de' ? '/de/?topic=habit-tracker#contact' : '/?topic=habit-tracker#contact');
+    const href = (CFG.site || '') + (lang === 'de' ? '/de/newsletter/?topic=habit-tracker' : '/subscribe/?topic=habit-tracker');
     return `<aside class="offer"><p><span class="ps">&gt;</span> ${esc(t('email_offer'))} <a href="${esc(href)}">${esc(t('email_link'))}</a></p>
       <p class="dim small">${esc(t('email_honest'))}</p>${force ? '' : `<button type="button" class="linkish small" data-act="hide-offer">${esc(t('email_hide'))}</button>`}</aside>`;
   }
