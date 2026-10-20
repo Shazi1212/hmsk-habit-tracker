@@ -29,8 +29,8 @@ python3 -m http.server 8080 --directory public   # or: npm start
 Any static web server works (nginx, Apache, GitHub Pages, Netlify). `public/config.js` sets where the links back to
 hmsk.life point; set `site: ''` if you host it next to your own site.
 
-The app uses the fonts Martian Mono and Geist when it finds them at `/assets/fonts/` or `public/fonts/`
-(both under the SIL Open Font License); otherwise it falls back to the system fonts.
+Fonts (Newsreader, Public Sans; SIL Open Font License) are in `public/fonts/`; the shared hmsk.life look is in
+`public/letterpress.css`.
 
 Demo data: open `/?demo=1`. It is generated in memory and never touches what you stored.
 
