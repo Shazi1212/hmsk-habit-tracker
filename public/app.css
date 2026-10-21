@@ -128,16 +128,8 @@ kbd { font: 600 11px/1 var(--sans); color: var(--ink-2); border: 1px solid var(-
 .grid .rh { position: sticky; left: 0; z-index: 1; background: var(--card); text-align: left; padding: 0 var(--xs) 0 var(--sm); border-right: 1px solid var(--rule); }
 .rh__in { display: block; max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 14px/1.2 var(--sans); color: var(--ink); }
 @media (min-width: 720px) { .rh__in { max-width: 220px; } }
-.cell { display: block; width: 32px; height: 40px; background: none; border: 0; padding: 0; position: relative; }
-.cell::after { content: ""; position: absolute; inset: 11px 7px; border-radius: 3px; border: 1px solid var(--rule-strong); background: var(--card); }
-.cell:hover:not(:disabled)::after { border-color: var(--accent); }
-.cell.on::after { background: var(--accent); border-color: var(--accent); }
-.cell:disabled::after { border-style: dashed; border-color: var(--rule); background: transparent; }
-.now .cell::after { box-shadow: 0 0 0 2px var(--mark); }
 .pc { padding: 0 var(--sm) !important; color: var(--ink-2); white-space: nowrap; }
 .pc.ok { color: var(--ok); font-weight: 600; }
-.dp { color: var(--ink-2); font-size: 11px; padding: var(--xs) 0 !important; }
-.grid tfoot td, .grid tfoot th { border-bottom: 0; }
 .grid--week thead th { min-width: 30px; }
 .grid--week .pc { padding: 0 var(--xs) !important; }
 @media (min-width: 420px) { .grid--week thead th { min-width: 40px; } }
@@ -145,6 +137,64 @@ kbd { font: 600 11px/1 var(--sans); color: var(--ink-2); border: 1px solid var(-
 .dot { display: inline-block; width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--rule-strong); vertical-align: middle; background: var(--card); }
 .dot.on { background: var(--accent); border-color: var(--accent); }
 .dot.f { border-style: dashed; border-color: var(--rule); background: transparent; }
+
+/* month grid: a calendar card per habit on phones, one row of days per habit from 768 px (no sideways scrolling) */
+.mg { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: var(--sm); margin: var(--sm) 0 var(--md); font: 400 13px/1 var(--sans); font-variant-numeric: tabular-nums; }
+.mg__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name pc" "wk wk" "days days"; align-items: center; gap: var(--xs) var(--sm);
+  padding: var(--sm); background: var(--card); border: 1px solid var(--rule-strong); border-radius: var(--radius); box-shadow: 0 30px 60px -48px var(--shadow); }
+.mg__row--head { display: none; }
+.mg__name { grid-area: name; min-width: 0; font: 500 15px/1.3 var(--sans); color: var(--ink); overflow-wrap: anywhere; }
+.mg__row--tot .mg__name { color: var(--ink-2); font-weight: 400; }
+.mg__pc { grid-area: pc; color: var(--ink-2); white-space: nowrap; }
+.mg__wk, .mg__days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.mg__wk { grid-area: wk; font-size: 11px; color: var(--ink-2); }
+.mg__days { grid-area: days; }
+.mg__days > .d1 { grid-column-start: var(--o); }
+.cell { position: relative; display: flex; align-items: center; justify-content: center; height: 40px; padding: 0; background: var(--card); color: var(--ink);
+  border: 1px solid var(--rule-strong); border-radius: var(--r-sm); font: 500 13px/1 var(--sans); transition: background-color .15s, border-color .15s; }
+.cell:hover:not(:disabled) { border-color: var(--accent); }
+.cell.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.cell:disabled { border-style: dashed; border-color: var(--rule); background: transparent; color: var(--ink-2); }
+.cell.now { box-shadow: 0 0 0 2px var(--mark); font-weight: 700; }
+.mg__v { display: grid; place-content: center; gap: 2px; height: 40px; color: var(--ink); font-size: 12px; }
+.mg__v .cell__n { font-size: 10px; color: var(--ink-2); }
+.mg__v.now .cell__n { color: var(--accent); font-weight: 700; }
+@media (min-width: 768px) {
+  .mg { display: block; background: var(--card); border: 1px solid var(--rule-strong); border-radius: var(--radius); --nw: 112px; }
+  .mg__row { grid-template-columns: var(--nw) minmax(0, 1fr) 44px; grid-template-areas: "name days pc"; gap: 0; padding: 0; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; box-shadow: none; }
+  .mg__row:last-child { border-bottom: 0; }
+  .mg__row--head { display: grid; color: var(--ink-2); font: 500 12px/1 var(--sans); }
+  .mg__name { padding: 0 var(--xs) 0 var(--sm); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mg__pc { padding: 0 var(--xs); text-align: right; font-size: 12px; }
+  .mg__wk { display: none; }
+  .mg__days { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 0; align-self: stretch; border-left: 1px solid var(--rule); }
+  .mg__days > .d1 { grid-column-start: auto; }
+  .mg__h { display: block; padding: 6px 0; }
+  .mg__h span { display: block; font-size: 10px; margin-bottom: 3px; }
+  .mg__h.now { color: var(--accent); font-weight: 700; }
+  .mg .we { background: var(--paper); }
+  .cell { height: 40px; border: 0; border-radius: 0; background: none; }
+  .cell.we { background: var(--paper); }
+  .cell__n { display: none; }
+  .cell::after { content: ""; position: absolute; inset: 11px max(2px, calc(50% - 9px)); border-radius: 3px; border: 1px solid var(--rule-strong); background: var(--card); }
+  .cell:hover:not(:disabled) { border: 0; }
+  .cell:hover:not(:disabled)::after { border-color: var(--accent); }
+  .cell.on { background: none; }
+  .cell.on.we { background: var(--paper); }
+  .cell.on::after { background: var(--accent); border-color: var(--accent); }
+  .cell:disabled { border: 0; }
+  .cell:disabled::after { border-style: dashed; border-color: var(--rule); background: transparent; }
+  .cell.now { box-shadow: none; }
+  .cell.now::after { box-shadow: 0 0 0 2px var(--mark); }
+  /* daily % as a small bar (the number stays in the title and for screen readers): digits don't fit 31 columns */
+  .mg__v { position: relative; height: 34px; }
+  .mg__v .cell__n { display: none; }
+  .mg__n { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mg__v[style]::after { content: ""; position: absolute; left: 50%; bottom: 8px; width: 6px; height: calc(var(--p) * 18px + 2px); transform: translateX(-50%);
+    border-radius: 1px; background: var(--accent); }
+  .mg__row--tot .mg__name { font-size: 13px; }
+}
+@media (min-width: 1024px) { .mg { --nw: 200px; } .mg__pc { font-size: 13px; } }
 
 /* forms */
 .field { display: grid; gap: 6px; margin: 0 0 var(--sm); }

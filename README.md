@@ -10,7 +10,7 @@ Tick your habits in one tap, see your streaks and look back once a week, without
 
 - Habits with a name, an optional emoji and a target: every day, or N days a week.
 - Today view: one tap (or keys 1 to 9) ticks a habit. Current and best streak per habit; weekly targets count weeks met.
-- Month grid (habits × days): tap any past day to fix it. Completion % this week and this month, a 12 week heatmap per habit.
+- Month grid (habits × days, a calendar per habit on phones), no sideways scrolling: tap any past day to fix it. Completion % this week and this month, a 12 week heatmap per habit.
 - Weekly review: the week at a glance plus a "what got in the way?" note per week.
 - Data stays in the browser (localStorage). JSON backup and restore, CSV export, and Excel (.xlsx) export of your real data,
   written in the browser by a small zip/OOXML writer (`public/xlsx.js`, no library).

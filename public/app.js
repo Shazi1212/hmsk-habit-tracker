@@ -168,31 +168,33 @@
       <button type="button" class="btn btn--ghost btn--sm" data-act="month" data-d="1" aria-label="${esc(t('next'))}" ${C.monthStart(today) <= monthCursor ? 'disabled' : ''}>&gt;</button>
       ${monthCursor !== C.monthStart(today) ? `<button type="button" class="btn btn--ghost btn--sm" data-act="month" data-d="0">${esc(t('today_btn'))}</button>` : ''}</span></div>`;
     if (!list.length) return `<section class="pad">${nav}<p class="lead">${esc(t('no_active'))}</p></section>`;
-    const head = days.map(k => { const d = C.parts(k)[2], wd = C.weekday(k);
-      return `<th scope="col" class="${wd > 5 ? 'we' : ''}${k === today ? ' now' : ''}"><span>${esc(t('wd')[wd - 1].slice(0, 2))}</span>${d}</th>`; }).join('');
+    // One grid for every width: a single row of days per habit from 768 px, a calendar card per habit below (app.css).
+    const o = C.weekday(monthCursor), wdn = t('wd').map(w => w.slice(0, 2));
+    const cls = k => (C.weekday(k) > 5 ? ' we' : '') + (k === today ? ' now' : '') + (k === monthCursor ? ' d1' : ''); // d1: calendar cards start day 1 under its weekday (--o)
+    const wk = `<span class="mg__wk" aria-hidden="true">${wdn.map(w => `<span>${esc(w)}</span>`).join('')}</span>`;
+    const head = days.map(k => `<span class="mg__h${cls(k)}"><span>${esc(wdn[C.weekday(k) - 1])}</span>${C.parts(k)[2]}</span>`).join('');
     const rows = list.map(h => {
       const c = C.completion(state, h, monthCursor, C.monthEnd(monthCursor), today);
       const cells = days.map(k => {
         const on = C.isDone(state, h.id, k), fut = k > today;
-        return `<td class="${C.weekday(k) > 5 ? 'we' : ''}${k === today ? ' now' : ''}"><button type="button" class="cell${on ? ' on' : ''}" data-act="cell" data-id="${h.id}" data-k="${k}" aria-pressed="${on}" ${fut ? 'disabled' : ''} aria-label="${esc(t('cell_label', { name: h.name, date: fmtDate(k, true) }))}"></button></td>`;
+        return `<button type="button" class="cell${on ? ' on' : ''}${cls(k)}" data-act="cell" data-id="${h.id}" data-k="${k}" aria-pressed="${on}" ${fut ? 'disabled' : ''} aria-label="${esc(t('cell_label', { name: h.name, date: fmtDate(k, true) }))}"><span class="cell__n" aria-hidden="true">${C.parts(k)[2]}</span></button>`;
       }).join('');
-      return `<tr><th scope="row" class="rh"><span class="rh__in" title="${esc(h.name)}">${hnameHtml(h)}</span></th>${cells}<td class="pc">${pct(c && c.pct)}</td></tr>`;
+      return `<div class="mg__row" role="group" aria-label="${esc(h.name)}"><span class="mg__name" title="${esc(h.name)}">${hnameHtml(h)}</span>${wk}<span class="mg__days">${cells}</span><span class="mg__pc">${pct(c && c.pct)}</span></div>`;
     }).join('');
     const foot = days.map(k => {
-      if (k > today) return '<td></td>';
-      const act = list.filter(h => C.habitStart(state, h) <= k);
-      if (!act.length) return '<td></td>';
+      const act = k > today ? [] : list.filter(h => C.habitStart(state, h) <= k);
       const n = act.filter(h => C.isDone(state, h.id, k)).length;
-      return `<td class="dp" title="${n}/${act.length}">${Math.round(n / act.length * 100)}</td>`;
+      const p = act.length ? n / act.length : null;
+      return `<span class="mg__v${cls(k)}"${p === null ? '' : ` style="--p:${p.toFixed(2)}" title="${n}/${act.length}"`}><span class="cell__n">${C.parts(k)[2]}</span><span class="mg__n">${p === null ? '' : Math.round(p * 100)}</span></span>`;
     }).join('');
     const mo = C.overall(state, monthCursor, C.monthEnd(monthCursor), today);
     return `<section class="pad">${nav}
       <p class="dim small">${esc(t('month_hint'))}</p>
-      <div class="grid-wrap" tabindex="0" aria-label="${esc(title)}"><table class="grid">
-        <thead><tr><th scope="col" class="rh"></th>${head}<th scope="col" class="pc">%</th></tr></thead>
-        <tbody>${rows}</tbody>
-        <tfoot><tr><th scope="row" class="rh dim">%</th>${foot}<td class="pc"><b>${pct(mo)}</b></td></tr></tfoot>
-      </table></div>
+      <div class="mg" style="--n:${days.length}; --o:${o}" role="group" aria-label="${esc(title)}">
+        <div class="mg__row mg__row--head" aria-hidden="true"><span class="mg__name"></span><span class="mg__days">${head}</span><span class="mg__pc">%</span></div>
+        ${rows}
+        <div class="mg__row mg__row--tot" role="group" aria-label="${esc(t('month_all'))}"><span class="mg__name" title="${esc(t('month_all'))}">${esc(t('month_all'))}</span>${wk}<span class="mg__days">${foot}</span><span class="mg__pc"><b>${pct(mo)}</b></span></div>
+      </div>
     </section>`;
   }
 
@@ -284,7 +286,7 @@
     if (focusSel) { const el = main.querySelector(focusSel); if (el) el.focus(); }
     scrollToToday();
   }
-  /** On a phone the month grid is wider than the screen: show the days around today. */
+  /** On a narrow phone the week grid can be wider than the screen: show the days around today. */
   function scrollToToday() {
     const wrap = main.querySelector('.grid-wrap'), now = wrap && wrap.querySelector('thead th.now');
     if (!now) return;
