@@ -103,13 +103,22 @@
     const n = weeks.flat().filter(c => c.done).length;
     return `<div class="heat" role="img" aria-label="${esc(t('heat_label', { name: h.name }))}: ${n}">${cells}</div>`;
   }
+  /** Weekly email after 7 days of use (email-moment.js). Only the address and the first Monday are sent: the email
+   *  links back here, where the week summary is built from the data in this browser. Always shown on the review tab. */
   function emailOffer(force) {
-    const used = state.meta.useDays.length >= 7;
-    if (DEMO && !force) return '';
-    if (!force && (!used || state.meta.emailOfferHidden)) return '';
-    const href = (CFG.site || '') + (lang === 'de' ? '/de/newsletter/?topic=habit-tracker' : '/subscribe/?topic=habit-tracker');
-    return `<aside class="offer"><p><span class="ps">&gt;</span> ${esc(t('email_offer'))} <a href="${esc(href)}">${esc(t('email_link'))}</a></p>
-      <p class="dim small">${esc(t('email_honest'))}</p>${force ? '' : `<button type="button" class="linkish small" data-act="hide-offer">${esc(t('email_hide'))}</button>`}</aside>`;
+    if (DEMO || !window.HMSKMoment || state.meta.useDays.length < 7) return '';
+    if (!force && state.meta.emailOfferHidden) return '';
+    return `<aside class="offer"><div data-em-box></div>${force ? '' : `<button type="button" class="linkish small" data-act="hide-offer">${esc(t('email_hide'))}</button>`}</aside>`;
+  }
+  function mountEmail() {
+    const box = main.querySelector('[data-em-box]'); if (!box) return;
+    const first = C.addDays(C.weekStart(today), 7);
+    HMSKMoment.render(box, {
+      lang, action: (CFG.site || '') + '/email/subscribe.php', privacy: (CFG.site || '') + (lang === 'de' ? '/datenschutz/' : '/privacy/') + '#newsletter',
+      source: '/apps/habit-tracker/', topic: 'habit-weekly', topicName: t('email_topic'), consent: 'own',
+      title: t('email_offer'), intro: t('email_honest'),
+      items: [{ date: first, label: t('email_label'), kind: 'deadline', text: t('email_item', { date: fmtDate(first, true) }) }],
+    });
   }
 
   // ---------- views ----------
@@ -283,6 +292,7 @@
     applyChrome();
     const fn = { today: renderToday, month: renderMonth, review: renderReview, habits: renderHabits, data: renderData }[view] || renderToday;
     main.innerHTML = fn();
+    mountEmail();
     if (focusSel) { const el = main.querySelector(focusSel); if (el) el.focus(); }
     scrollToToday();
   }

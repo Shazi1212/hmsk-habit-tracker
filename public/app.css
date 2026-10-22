@@ -111,8 +111,7 @@ kbd { font: 600 11px/1 var(--sans); color: var(--ink-2); border: 1px solid var(-
 .sug__add { margin-left: auto; font: 600 14px/1 var(--sans); color: var(--accent); white-space: nowrap; }
 
 /* email offer */
-.offer { margin-top: var(--lg); padding: var(--sm) var(--md); border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; max-width: 620px; font-size: 15px; background: var(--accent-tint); }
-.offer p { margin: 0 0 4px; }
+.offer { margin-top: var(--lg); max-width: 720px; } /* the form inside is styled by email-moment.js */
 
 /* month + week grid */
 .nav-row { display: flex; align-items: center; gap: var(--xs); margin-bottom: var(--sm); flex-wrap: wrap; justify-content: space-between; }
